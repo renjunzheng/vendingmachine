@@ -1,0 +1,5 @@
+red forbidden:
+https://www.iconfinder.com/icons/619539/cancel_close_delete_dismiss_exit_recycle_remove_icon#size=128
+
+green pass:
+https://www.iconfinder.com/icons/619543/add_done_good_ok_success_tick_yes_icon#size=128

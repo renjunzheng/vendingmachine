@@ -22,7 +22,7 @@ public class MachineDetail extends AppCompatActivity {
         Intent intent = getIntent();
         String title = intent.getStringExtra(Intent.EXTRA_TEXT);
         setTitle(title);
-
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -30,8 +30,9 @@ public class MachineDetail extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        });*/
+        if(getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 }
