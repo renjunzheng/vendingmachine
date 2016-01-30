@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 
 import java.net.URI;
 
@@ -19,10 +21,15 @@ import java.net.URI;
  */
 public class MachineDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    private GridView mGridView;
+
     //unique for each loader to use in activity
     private static final int DETAIL_LOADER = 0;
 
-    //private MerchandiseAdapter mMerchandiseAdapter;
+    static final int COL_MERCHANDISE_ID = 0;
+    static final int COL_MERCHANDISE_DESC = 1;
+
+    private MerchandiseAdapter mMerchandiseAdapter;
 
     public MachineDetailFragment() {
     }
@@ -30,7 +37,30 @@ public class MachineDetailFragment extends Fragment implements LoaderManager.Loa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_machine_detail, container, false);
+        // The ForecastAdapter will take data from a source and
+        // use it to populate the ListView it's attached to.
+        mMerchandiseAdapter = new MerchandiseAdapter(getActivity(), null, 0);
+
+        View rootView = inflater.inflate(R.layout.fragment_machine_detail, container, false);
+
+        // Get a reference to the ListView, and attach this adapter to it.
+        mGridView = (GridView) rootView.findViewById(R.id.gridview_merchandise);
+        mGridView.setAdapter(mMerchandiseAdapter);
+        // We'll call our MainActivity
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    //TODO: click listener
+                }
+            }
+        });
+
+        return rootView;
     }
 
     //required to implement using loadercallback
@@ -49,10 +79,10 @@ public class MachineDetailFragment extends Fragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor){
-        //mMerchandiseAdapter.swapCursor(cursor);
+        mMerchandiseAdapter.swapCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {//mMerchandiseAdapter.swapCursor(null);
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {mMerchandiseAdapter.swapCursor(null);
     }
 }

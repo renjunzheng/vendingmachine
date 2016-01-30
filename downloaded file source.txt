@@ -3,3 +3,15 @@ https://www.iconfinder.com/icons/619539/cancel_close_delete_dismiss_exit_recycle
 
 green pass:
 https://www.iconfinder.com/icons/619543/add_done_good_ok_success_tick_yes_icon#size=128
+
+hersheys:
+http://www.hersheys.com/images/products/2746/hershey-bars-milk-chocolate-almonds_sm.png
+
+kitkat:
+https://upload.wikimedia.org/wikipedia/en/5/5d/Kit-Kat-Wrapper-Small.jpg
+
+reese's:
+https://upload.wikimedia.org/wikipedia/en/9/97/Reese%27s-PB-Cups-Wrapper-Small.png
+
+snickers:
+https://upload.wikimedia.org/wikipedia/en/3/3c/Snickers_wrapped.png

@@ -9,5 +9,9 @@
     tools:context="com.renjunzheng.vendingmachine.MachineDetailFragment"
     tools:showIn="@layout/activity_machine_detail">
 
+    <GridView
+        android:id="@+id/gridview_merchandise"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
