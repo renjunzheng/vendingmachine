@@ -28,20 +28,25 @@ public class VMSelectionFragment extends Fragment {
                              Bundle savedInstanceState) {
         //building data
         String[] buildings = {
-                "ECE Available",
-                "MSEE Not Available",
-                "WANG HALL Not Available"
+                "ECE",
+                "MSEE",
+                "WANG HALL"
         };
-
+        //newly added, should be able to dynamically change in the future
+        //not sure why it needs to be declared as final
+        final boolean[] availability = {
+                true,
+                false,
+                false
+        };
         //turn building data into ArrayList
-        List<String> machines = new ArrayList<String>(Arrays.asList(buildings));
+        ArrayList<String> machines = new ArrayList<String>(Arrays.asList(buildings));
 
         //link ArrayList to ArrayAdapter
-        final ArrayAdapter<String> machinesAdapter = new ArrayAdapter<String>(
+        final VMSelectionAdapter machinesAdapter = new VMSelectionAdapter(
                 getActivity(),
-                R.layout.list_item_machines,
-                R.id.list_item_machines_textview,
-                machines
+                buildings,
+                availability
         );
 
         //bind ArrayAdapter with the ListView
@@ -53,19 +58,9 @@ public class VMSelectionFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String machineDetail = machinesAdapter.getItem(position);
-                boolean availability = true;
-                String site = new String ("");
-                for(String parsed: machineDetail.split(" ")){
-                    if(parsed.equals("Not")){
-                        availability = false;
-                        break;
-                    }
-                    else if(!parsed.equals("Available")){
-                        site += " " + parsed;
-                    }
-                }
-                if(availability){
+                String site = machinesAdapter.getItem(position);
+                boolean availability_temp = availability[position];
+                if(availability_temp){
                     Intent intent = new Intent(getActivity(), MachineDetail.class).putExtra(Intent.EXTRA_TEXT, site);
                     startActivity(intent);
                 }else{
