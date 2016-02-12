@@ -15,3 +15,6 @@ https://upload.wikimedia.org/wikipedia/en/9/97/Reese%27s-PB-Cups-Wrapper-Small.p
 
 snickers:
 https://upload.wikimedia.org/wikipedia/en/3/3c/Snickers_wrapped.png
+
+purdue university 128px
+https://en.wikipedia.org/wiki/File:Purdue_University_Seal.svg
