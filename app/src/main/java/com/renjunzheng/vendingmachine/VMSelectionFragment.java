@@ -40,7 +40,7 @@ public class VMSelectionFragment extends Fragment {
                 false
         };
         //turn building data into ArrayList
-        ArrayList<String> machines = new ArrayList<String>(Arrays.asList(buildings));
+        ArrayList<String> machines = new ArrayList<>(Arrays.asList(buildings));
 
         //link ArrayList to ArrayAdapter
         final VMSelectionAdapter machinesAdapter = new VMSelectionAdapter(
@@ -64,7 +64,7 @@ public class VMSelectionFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), MachineDetail.class).putExtra(Intent.EXTRA_TEXT, site);
                     startActivity(intent);
                 }else{
-                    Toast.makeText(getActivity(),"Machine located at " + site + " currently offline.\nTry other machines! ;)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"Machine located at " + site + " currently offline.\nTry other machines!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
