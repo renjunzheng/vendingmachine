@@ -1,5 +1,6 @@
 package com.renjunzheng.vendingmachine;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -77,7 +78,8 @@ public class VMSelection extends AppCompatActivity
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_history) {
-
+            Intent intent = new Intent(this, PurchaseHistory.class);
+            startActivity(intent);
         } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_share) {

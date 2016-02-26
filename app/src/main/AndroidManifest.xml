@@ -27,6 +27,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.renjunzheng.vendingmachine.VMSelection" />
         </activity>
+        <activity
+            android:name=".PurchaseHistory"
+            android:label="@string/title_activity_purchase_history"
+            android:parentActivityName=".VMSelection"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.renjunzheng.vendingmachine.VMSelection" />
+        </activity>
+        <activity
+            android:name=".QRCodeDetail"
+            android:label="@string/title_activity_qrcode_detail"
+            android:parentActivityName=".PurchaseHistory"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.renjunzheng.vendingmachine.PurchaseHistory" />
+        </activity>
     </application>
 
 </manifest>
