@@ -5,19 +5,19 @@
         <item
             android:id="@+id/nav_personal"
             android:icon="@drawable/perm_group_personal_info"
-            android:title="Personal Information" />
+            android:title="Information" />
         <item
             android:id="@+id/nav_history"
             android:icon="@drawable/ic_lock_lock_alpha"
-            android:title="Purchase History" />
+            android:title="History" />
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Photo Gallery" />
+            android:title="Gallery" />
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/perm_group_system_tools"
-            android:title="Application Setting" />
+            android:title="Setting" />
     </group>
 
     <item android:title="Communicate">
@@ -25,15 +25,15 @@
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Experience Share" />
+                android:title="Share" />
             <item
                 android:id="@+id/nav_rate"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Rate Us" />
+                android:title="Rate" />
             <item
                 android:id="@+id/nav_report"
                 android:icon="@drawable/ic_menu_manage"
-                android:title="Error Report" />
+                android:title="Report" />
         </menu>
     </item>
 

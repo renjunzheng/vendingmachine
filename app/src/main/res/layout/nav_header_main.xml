@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:orientation="horizontal"
-    android:gravity="bottom">
-    <!--android:background="@drawable/side_nav_bar" is not an error, it's just not be able to preview-->
-    <!--    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:layout_height="160dp"
+    android:background="@drawable/campus"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:layout_height="@dimen/nav_header_height"
-    delete for better layout-->
-    <ImageView
+    android:theme="@style/ThemeOverlay.AppCompat.Dark" >
+    <!--android:background="@drawable/side_nav_bar" is not an error, it's just not be able to preview-->
+
+    <!--<ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/purdue_university"
         android:id="@+id/purdueIcon"
-        android:layout_gravity="center" />
+        android:layout_gravity="center" />-->
     <!-- android:src="@android:drawable/sym_def_app_icon" only exists in android:drawable -->
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:background="@drawable/side_nav_bar"
         android:id="@+id/inner_layout"
         android:layout_height="match_parent"
@@ -45,5 +45,24 @@
             android:paddingBottom="@dimen/nav_header_vertical_spacing"
             android:layout_gravity="center"
             android:id="@+id/userEmail" />
-    </LinearLayout>
+    </LinearLayout>-->
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:src="@android:drawable/sym_def_app_icon" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:text="Name"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="e@mail" />
 </LinearLayout>

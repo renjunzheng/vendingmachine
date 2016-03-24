@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/renjunzheng/vendingmachine/MyGcmListenerService.java" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/renjunzheng/vendingmachine/QuickstartPreferences.java" charset="GB18030" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/renjunzheng/vendingmachine/SplashScreen.java" charset="GB18030" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

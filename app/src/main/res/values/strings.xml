@@ -7,5 +7,5 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="dummy_receipt_code">Dummy receipt code</string>
-
+    <string name="title_activity_splash_screen">SplashScreen</string>
 </resources>

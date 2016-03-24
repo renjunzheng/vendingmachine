@@ -19,8 +19,8 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="false"
+        android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
-    <!-- android:fitsSystemWindows="true" was set to false because i don't want navigation bar too tall-->
+    <!-- android:fitsSystemWindows="true" can be set to false if i don't want navigation bar too tall-->
 </android.support.v4.widget.DrawerLayout>
