@@ -94,7 +94,7 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 // This method will be executed once the timer is over
                 // Start your app main activity
-                Intent i = new Intent(SplashScreen.this, VMSelection.class);
+                Intent i = new Intent(SplashScreen.this, LoginScreen.class);
                 startActivity(i);
 
                 // close this activity
@@ -102,9 +102,6 @@ public class SplashScreen extends AppCompatActivity {
             }
         }, SPLASH_TIME_OUT);
 
-        // close this activity
-        //Log.i(TAG, "will this ever execute?");
-        //finish();
     }
 
     @Override
