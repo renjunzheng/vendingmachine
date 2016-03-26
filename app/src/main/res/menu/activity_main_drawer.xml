@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/nav_menu_top">
         <item
             android:id="@+id/nav_personal"
             android:icon="@drawable/perm_group_personal_info"
@@ -20,21 +21,32 @@
             android:title="Setting" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_rate"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Rate" />
-            <item
-                android:id="@+id/nav_report"
-                android:icon="@drawable/ic_menu_manage"
-                android:title="Report" />
-        </menu>
-    </item>
+    <group android:checkableBehavior="single"
+        android:id="@+id/nav_menu_mid">
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/ic_menu_share"
+            android:title="Share" />
+        <item
+            android:id="@+id/nav_rate"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Rate" />
+        <item
+            android:id="@+id/nav_report"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Report" />
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/nav_menu_bot">
+        <item
+            android:id="@+id/nav_log_out"
+            android:icon="@mipmap/ic_input_white_48dp"
+            android:title="Log out" />
+        <item
+            android:id="@+id/nav_exit"
+            android:icon="@mipmap/ic_power_settings_new_white_48dp"
+            android:title="Exit" />
+    </group>
 
 </menu>

@@ -1,11 +1,15 @@
 package com.renjunzheng.vendingmachine;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -74,6 +78,38 @@ public class RegistrationIntentService extends IntentService {
      */
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
+
+        final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                try {
+                    Bundle data = new Bundle();
+                    // the account is used for keeping
+                    // track of user notifications
+                    data.putString("account", "well");
+                    // the action is used to distinguish
+                    // different message types on the server
+                    data.putString("action", "INITIALIZE_TOKEN");
+                    data.putString("message", "having fun");
+
+                    //String msgId = Integer.toString(getNextMsgId());
+                    String projectId = getString(R.string.gcm_defaultSenderId);
+                    gcm.send(projectId + "@gcm.googleapis.com", "1", data);
+                } catch (IOException e) {
+                    Log.e(TAG, "IOException while sending registration id", e);
+                    return "register id";
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                if (result != null) {
+                    Log.e(TAG, "send message failed: " + result);
+                }
+            }
+        }.execute(null, null, null);
     }
 
     /**

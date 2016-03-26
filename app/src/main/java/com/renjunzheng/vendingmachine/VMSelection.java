@@ -2,8 +2,10 @@ package com.renjunzheng.vendingmachine;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -110,6 +112,16 @@ public class VMSelection extends AppCompatActivity
                 startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse("http://play.google.com/store/apps/details?id=" + getApplicationContext().getPackageName())));
             }
+        } else if (id == R.id.nav_log_out) {
+            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+            editor.putBoolean("user_logged_in", false);
+            editor.apply();
+            Intent i = new Intent(this, LoginScreen.class);
+            startActivity(i);
+            finish();
+        } else if (id == R.id.nav_exit) {
+            finish();
+            System.exit(0);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

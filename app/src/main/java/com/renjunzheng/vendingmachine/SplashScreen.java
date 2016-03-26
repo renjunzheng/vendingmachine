@@ -94,9 +94,17 @@ public class SplashScreen extends AppCompatActivity {
             public void run() {
                 // This method will be executed once the timer is over
                 // Start your app main activity
-                Intent i = new Intent(SplashScreen.this, LoginScreen.class);
-                startActivity(i);
 
+                Boolean logged_in = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("user_logged_in", false);
+                //at least I think for this logged_in value, only when the user starts this app really for the first time it will take the false value.
+                //other case if the user logged out it will take false value, there are no other case it will be false I believe
+                if (logged_in) {
+                    Intent i = new Intent(SplashScreen.this, VMSelection.class);
+                    startActivity(i);
+                } else {
+                    Intent i = new Intent(SplashScreen.this, LoginScreen.class);
+                    startActivity(i);
+                }
                 // close this activity
                 finish();
             }

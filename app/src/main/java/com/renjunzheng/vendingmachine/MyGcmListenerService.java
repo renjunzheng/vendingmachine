@@ -20,6 +20,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -64,7 +65,15 @@ public class MyGcmListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+
+
+        if(data.getString("action").equals("NOTIFICATION")) {
+            sendNotification(message);
+        }else if(data.getString("action").equals("CONFIRM_REGISTER")){
+
+        }else if(data.getString("action").equals("CONFIRM_UPDATE_NUMBER")){
+
+        }
         // [END_EXCLUDE]
     }
     // [END receive_message]
@@ -82,12 +91,14 @@ public class MyGcmListenerService extends GcmListenerService {
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.icon)
-                .setContentTitle("UVM")
+                .setSmallIcon(R.drawable.icon_w)
+                .setContentTitle("Ultimate Vending Machine")
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
+                .setContentIntent(pendingIntent)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.icon))
+                .setColor(getColor(R.color.notification_color));
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

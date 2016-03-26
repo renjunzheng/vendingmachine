@@ -21,3 +21,6 @@ https://en.wikipedia.org/wiki/File:Purdue_University_Seal.svg
 
 campus:
 http://www.arboretum.purdue.edu/wp-content/uploads/2013/07/aerial_campus_main-1024x675.jpg
+
+splashscreen:
+https://s-media-cache-ak0.pinimg.com/736x/40/8d/7a/408d7a4893b40415be56727a85f64119.jpg
