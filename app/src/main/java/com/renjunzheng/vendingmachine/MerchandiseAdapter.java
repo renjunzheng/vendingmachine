@@ -25,13 +25,16 @@ public class MerchandiseAdapter extends CursorAdapter{
     public static class ViewHolder {
         public final ImageView iconView;
         public final TextView descriptionView;
+        public final TextView numView;
+        public final TextView nameView;
 
         public ViewHolder(View view) {
             iconView = (ImageView) view.findViewById(R.id.merchandise_icon);
-            descriptionView = (TextView) view.findViewById(R.id.list_item_merchandise_textview);
+            descriptionView = (TextView) view.findViewById(R.id.list_item_merchandise_description_textview);
+            numView = (TextView) view.findViewById(R.id.list_item_merchandise_num_textview);
+            nameView = (TextView) view.findViewById(R.id.list_item_merchandise_name_textview);
         }
     }
-
 
     /*
     Remember that these views are reused as needed.
@@ -53,10 +56,9 @@ public class MerchandiseAdapter extends CursorAdapter{
         // we'll keep the UI functional with a simple (and slow!) binding.
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-        int viewType = getItemViewType(cursor.getPosition());
-
-        viewHolder.iconView.setImageResource(Utility.getArtResourceForMerchandise(cursor.getInt(MachineDetailFragment.COL_MERCHANDISE_ID)));
-        viewHolder.descriptionView.setText(cursor.getString(MachineDetailFragment.COL_MERCHANDISE_DESC));
+        viewHolder.iconView.setImageResource(Utility.getArtResourceForMerchandise(cursor.getString(MachineDetailFragment.COL_ITEM_NAME)));
+        viewHolder.descriptionView.setText(cursor.getString(MachineDetailFragment.COL_ITEM_SHORT_DESC));
+        viewHolder.numView.setText(cursor.getString(MachineDetailFragment.COL_ITEM_REMAINING_NUM));
+        viewHolder.nameView.setText(cursor.getString(MachineDetailFragment.COL_ITEM_NAME));
     }
 }

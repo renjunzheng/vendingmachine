@@ -92,6 +92,9 @@
             android:name=".RegistrationIntentService"
             android:exported="false">
         </service>
+        <provider
+            android:authorities="com.renjunzheng.vendingmachine"
+            android:name=".data.DataProvider" />
     </application>
 
 </manifest>

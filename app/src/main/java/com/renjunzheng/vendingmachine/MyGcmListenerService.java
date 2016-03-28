@@ -18,6 +18,8 @@ package com.renjunzheng.vendingmachine;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -28,6 +30,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.renjunzheng.vendingmachine.data.DataContract;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MyGcmListenerService extends GcmListenerService {
 
@@ -44,6 +50,9 @@ public class MyGcmListenerService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
+        String action = data.getString("action");
+        Log.d(TAG, "info: " + data.getString("updated_info"));
+        String updated_info = data.getString("updated_info");
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
 
@@ -67,16 +76,48 @@ public class MyGcmListenerService extends GcmListenerService {
          */
 
 
-        if(data.getString("action").equals("NOTIFICATION")) {
+        if(action.equals("NOTIFICATION")) {
             sendNotification(message);
-        }else if(data.getString("action").equals("CONFIRM_REGISTER")){
+        }else if(action.equals("CONFIRM_REGISTER")){
 
-        }else if(data.getString("action").equals("CONFIRM_UPDATE_NUMBER")){
+        }else if(action.equals("CONFIRM_UPDATE_NUMBER")){
 
+        }else if(action.equals("UPDATE_STORAGE_INFO")){
+            updateStorageInfo(updated_info);
         }
         // [END_EXCLUDE]
     }
     // [END receive_message]
+
+    private void updateStorageInfo(String updated_info) {
+
+        try {
+            JSONObject infoJson = new JSONObject(updated_info);
+
+            ContentValues newValues = new ContentValues();
+            newValues.put(DataContract.ItemEntry.COLUMN_REMAINING_NUM, infoJson.getInt("remaining_num"));
+            newValues.put(DataContract.ItemEntry.COLUMN_SHORT_DESC, infoJson.getString("short_desc"));
+            String selection = DataContract.ItemEntry.COLUMN_ITEM_NAME + " =?";
+
+            String[] selectionArgs = {infoJson.getString("item_name")};
+            int rowUpdated = getContentResolver().update(DataContract.ItemEntry.CONTENT_URI,
+                    newValues,
+                    selection,
+                    selectionArgs);
+
+
+            if(rowUpdated == 0){
+                newValues.put(DataContract.ItemEntry.COLUMN_ITEM_NAME, infoJson.getString("item_name"));
+                Uri returnedUri = getContentResolver().insert(DataContract.ItemEntry.CONTENT_URI,
+                        newValues);
+                Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
+            }else{
+                Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
+            }
+        }catch (JSONException e){
+            Log.e(TAG, "error when parsing Json");
+        }
+    }
 
     /**
      * Create and show a simple notification containing the received GCM message.
