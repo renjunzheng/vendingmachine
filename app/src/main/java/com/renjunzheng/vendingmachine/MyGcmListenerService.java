@@ -91,6 +91,11 @@ public class MyGcmListenerService extends GcmListenerService {
 
     private void updateStorageInfo(String updated_info) {
 
+        //as far as I think, this should receive all the information about all four products
+        //so whenever we substitute some product, the original one will not be kept in there
+        //or we need some level of delete functionality? or do we need a sync adapter?
+        //is this a good idea? what happens when the number of item increases?
+
         try {
             JSONObject infoJson = new JSONObject(updated_info);
 
