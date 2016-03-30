@@ -315,6 +315,12 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
 
             try {
                 // Simulate network access.
+
+                //right now I would prefer to use gcm to send and receive the login info
+                //I am not sure how to manage that within this activity though
+                //from what i understand now, it use cursor in this activity?
+                //not sure if that's true and how it would help
+
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 return false;
