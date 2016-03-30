@@ -22,10 +22,12 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -51,10 +53,11 @@ public class MyGcmListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         String message = data.getString("message");
         String action = data.getString("action");
-        Log.d(TAG, "info: " + data.getString("updated_info"));
+        Log.d(TAG, "action: " + data.getString("action"));
         String updated_info = data.getString("updated_info");
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Message: " + message);
+        String login_status_code = data.getString("status_code");
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -80,14 +83,23 @@ public class MyGcmListenerService extends GcmListenerService {
             sendNotification(message);
         }else if(action.equals("CONFIRM_REGISTER")){
 
-        }else if(action.equals("CONFIRM_UPDATE_NUMBER")){
-
+        }else if(action.equals("CONFIRM_LOG_IN")){
+            loginFeedback(login_status_code);
         }else if(action.equals("UPDATE_STORAGE_INFO")){
             updateStorageInfo(updated_info);
         }
         // [END_EXCLUDE]
     }
     // [END receive_message]
+
+    private void loginFeedback(String login_status_code){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+        editor.putBoolean("login_checked", true);
+        editor.putInt("login_status_code", Integer.parseInt(login_status_code));
+        Log.i(TAG,"status_code returned: "+ login_status_code);
+        editor.apply();
+    }
+
 
     private void updateStorageInfo(String updated_info) {
 

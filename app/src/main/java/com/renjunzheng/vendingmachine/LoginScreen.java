@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -32,6 +33,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -190,7 +194,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -303,29 +307,62 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
 
         private final String mEmail;
         private final String mPassword;
+        private Context mContext;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password, Context context) {
             mEmail = email;
             mPassword = password;
+            mContext = context;
         }
+
+        final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            // Not the most elegant way for checking if logged in I think.
+            // So basically I have one bool will be true once received server response regarding the validation
+            // but I have to use a timer set to 1000 ms so that it didn't check the boolean value too frequently
+            // then with the status code server send back, I can determine whether the password is correct.
+            // right now no matter what it will tell the password is wrong, instead of more accurate info.
 
             try {
-                // Simulate network access.
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                editor.putBoolean("login_checked", false);
+                editor.apply();
+                while (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("login_checked", false)) {
+                    Bundle data = new Bundle();
+                    // the action is used to distinguish
+                    // different message types on the server
+                    data.putString("action", "LOGIN");
+                    data.putString("email", mEmail);
+                    data.putString("passwd", mPassword);
 
-                //right now I would prefer to use gcm to send and receive the login info
-                //I am not sure how to manage that within this activity though
-                //from what i understand now, it use cursor in this activity?
-                //not sure if that's true and how it would help
+                    int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("msgId", 0);
+                    editor.putInt("msgId", storedMsgId++);
+                    editor.apply();
 
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                    String msgId = Integer.toString(storedMsgId);
+                    String projectId = getString(R.string.gcm_defaultSenderId);
+                    gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
+                    SystemClock.sleep(1000);
+                }
+                editor.putBoolean("login_checked", false);
+                editor.apply();
+                switch (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("login_status_code", 400)) {
+                    case 400:
+                        return false;
+                    case 200:
+                        return true;
+                    // TODO: register the new account here.
+                    //return false;
+                    default:
+                        return false;
+                }
+            } catch (IOException e) {
+                Log.e(TAG,"ioexception");
                 return false;
             }
-
+            /*
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
@@ -333,9 +370,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
                     return pieces[1].equals(mPassword);
                 }
             }
-
-            // TODO: register the new account here.
-            return true;
+            */
         }
 
         @Override

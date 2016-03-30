@@ -24,5 +24,4 @@
     </string>
 
     <bool name="user_logged_in">false</bool>
-    <string name="test">haha</string>
 </resources>
