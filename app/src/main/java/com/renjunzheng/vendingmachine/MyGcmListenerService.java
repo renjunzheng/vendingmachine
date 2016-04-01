@@ -1,3 +1,4 @@
+
 /**
  * Copyright 2015 Google Inc. All Rights Reserved.
  *
@@ -23,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -33,6 +35,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 import com.renjunzheng.vendingmachine.data.DataContract;
+import com.renjunzheng.vendingmachine.data.DataDbHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,10 +90,30 @@ public class MyGcmListenerService extends GcmListenerService {
             loginFeedback(login_status_code);
         }else if(action.equals("UPDATE_STORAGE_INFO")){
             updateStorageInfo(updated_info);
+        }else if(action.equals("UPDATE_PURCHASE_INFO")){
+            updatePurchaseInfo("temp");
         }
         // [END_EXCLUDE]
     }
     // [END receive_message]
+
+    private void updatePurchaseInfo(String purchaseInfo){
+        try {
+            DataDbHelper dbHelper = new DataDbHelper(this);
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+            database.delete(DataContract.PurchasedEntry.TABLE_NAME,null,null);
+            database.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DataContract.PurchasedEntry.TABLE_NAME + "'");
+
+
+            JSONObject infoJson = new JSONObject(purchaseInfo);
+
+            database.close();
+            dbHelper.close();
+        }catch (JSONException e){
+            Log.e(TAG, "error when parsing Json");
+        }
+    }
 
     private void loginFeedback(String login_status_code){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
@@ -100,7 +123,6 @@ public class MyGcmListenerService extends GcmListenerService {
         editor.apply();
     }
 
-
     private void updateStorageInfo(String updated_info) {
 
         //as far as I think, this should receive all the information about all four products
@@ -109,6 +131,13 @@ public class MyGcmListenerService extends GcmListenerService {
         //is this a good idea? what happens when the number of item increases?
 
         try {
+            DataDbHelper dbHelper = new DataDbHelper(this);
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+            database.delete(DataContract.ItemEntry.TABLE_NAME,null,null);
+            database.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DataContract.ItemEntry.TABLE_NAME + "'");
+
+
             JSONObject infoJson = new JSONObject(updated_info);
 
             ContentValues newValues = new ContentValues();
@@ -117,20 +146,27 @@ public class MyGcmListenerService extends GcmListenerService {
             String selection = DataContract.ItemEntry.COLUMN_ITEM_NAME + " =?";
 
             String[] selectionArgs = {infoJson.getString("item_name")};
+            /*String[] temp = {};
+            getContentResolver().delete(DataContract.ItemEntry.CONTENT_URI,
+                    DataContract.ItemEntry.COLUMN_ITEM_NAME + " IS NOT NULL",
+                    temp);
+
             int rowUpdated = getContentResolver().update(DataContract.ItemEntry.CONTENT_URI,
                     newValues,
                     selection,
                     selectionArgs);
 
-
-            if(rowUpdated == 0){
+            if(rowUpdated == 0){*/
                 newValues.put(DataContract.ItemEntry.COLUMN_ITEM_NAME, infoJson.getString("item_name"));
                 Uri returnedUri = getContentResolver().insert(DataContract.ItemEntry.CONTENT_URI,
                         newValues);
                 Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
-            }else{
+            /*}else{
                 Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
-            }
+            }*/
+
+            database.close();
+            dbHelper.close();
         }catch (JSONException e){
             Log.e(TAG, "error when parsing Json");
         }
