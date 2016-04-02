@@ -37,6 +37,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 import com.renjunzheng.vendingmachine.data.DataContract;
 import com.renjunzheng.vendingmachine.data.DataDbHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,13 +55,11 @@ public class MyGcmListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
+
         String action = data.getString("action");
         Log.d(TAG, "action: " + data.getString("action"));
-        String updated_info = data.getString("updated_info");
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
-        String login_status_code = data.getString("status_code");
+
+
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -83,12 +82,15 @@ public class MyGcmListenerService extends GcmListenerService {
 
 
         if(action.equals("NOTIFICATION")) {
+            String message = data.getString("message");
             sendNotification(message);
         }else if(action.equals("CONFIRM_REGISTER")){
 
         }else if(action.equals("CONFIRM_LOG_IN")){
+            String login_status_code = data.getString("status_code");
             loginFeedback(login_status_code);
         }else if(action.equals("UPDATE_STORAGE_INFO")){
+            String updated_info = data.getString("updated_info");
             updateStorageInfo(updated_info);
         }else if(action.equals("UPDATE_PURCHASE_INFO")){
             updatePurchaseInfo("temp");
@@ -137,31 +139,28 @@ public class MyGcmListenerService extends GcmListenerService {
             database.delete(DataContract.ItemEntry.TABLE_NAME,null,null);
             database.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DataContract.ItemEntry.TABLE_NAME + "'");
 
+            //get this valueArray from the string
+            JSONArray valueArray = new JSONArray(updated_info);
+            for(int lc = 0; lc < valueArray.length(); ++ lc){
+                JSONObject infoJson = valueArray.getJSONObject(lc);
+                //everything is the same as following code
+                ContentValues newValues = new ContentValues();
+                newValues.put(DataContract.ItemEntry.COLUMN_REMAINING_NUM, infoJson.getInt("remaining_num"));
+                newValues.put(DataContract.ItemEntry.COLUMN_SHORT_DESC, infoJson.getString("short_desc"));
 
-            JSONObject infoJson = new JSONObject(updated_info);
-
-            ContentValues newValues = new ContentValues();
-            newValues.put(DataContract.ItemEntry.COLUMN_REMAINING_NUM, infoJson.getInt("remaining_num"));
-            newValues.put(DataContract.ItemEntry.COLUMN_SHORT_DESC, infoJson.getString("short_desc"));
-            String selection = DataContract.ItemEntry.COLUMN_ITEM_NAME + " =?";
-
-            String[] selectionArgs = {infoJson.getString("item_name")};
-            /*String[] temp = {};
-            getContentResolver().delete(DataContract.ItemEntry.CONTENT_URI,
-                    DataContract.ItemEntry.COLUMN_ITEM_NAME + " IS NOT NULL",
-                    temp);
-
-            int rowUpdated = getContentResolver().update(DataContract.ItemEntry.CONTENT_URI,
-                    newValues,
-                    selection,
-                    selectionArgs);
-
-            if(rowUpdated == 0){*/
                 newValues.put(DataContract.ItemEntry.COLUMN_ITEM_NAME, infoJson.getString("item_name"));
                 Uri returnedUri = getContentResolver().insert(DataContract.ItemEntry.CONTENT_URI,
                         newValues);
                 Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
-            /*}else{
+            }
+
+            /*
+            String selection = DataContract.ItemEntry.COLUMN_ITEM_NAME + " =?";
+            String[] selectionArgs = {infoJson.getString("item_name")};
+            int rowUpdated = getContentResolver().update(DataContract.ItemEntry.CONTENT_URI,
+                    newValues,
+                    selection,
+                    selectionArgs);
                 Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
             }*/
 
