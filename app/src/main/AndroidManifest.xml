@@ -4,11 +4,17 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <permission android:name="com.renjunzheng.vendingmachine.permission.C2D_MESSAGE"
+    <permission
+        android:name="com.renjunzheng.vendingmachine.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
-    <uses-permission android:name="com.renjunzheng.vendingmachine.permission.C2D_MESSAGE" />
 
+    <uses-permission android:name="com.renjunzheng.vendingmachine.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +26,7 @@
             android:name=".SplashScreen"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,13 +36,20 @@
         <activity
             android:name=".LoginScreen"
             android:label="LoginScreen"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".RegisterUser"
+            android:label="@string/title_activity_register_user"
+            android:parentActivityName=".LoginScreen"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.renjunzheng.vendingmachine.LoginScreen" />
         </activity>
         <activity
             android:name=".VMSelection"
             android:label="VMSelection"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MachineDetail"
             android:label="@string/title_activity_machine_detail"
@@ -68,15 +81,17 @@
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.example.gcm" />
             </intent-filter>
         </receiver>
+
         <service
             android:name=".MyGcmListenerService"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
@@ -90,11 +105,21 @@
         </service>
         <service
             android:name=".RegistrationIntentService"
-            android:exported="false">
-        </service>
+            android:exported="false" />
+
         <provider
-            android:authorities="com.renjunzheng.vendingmachine"
-            android:name=".data.DataProvider" />
+            android:name=".data.DataProvider"
+            android:authorities="com.renjunzheng.vendingmachine" />
+
+        <activity
+            android:name=".ItemDetail"
+            android:label="@string/title_activity_item_detail"
+            android:parentActivityName=".MachineDetail"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.renjunzheng.vendingmachine.MachineDetail" />
+        </activity>
     </application>
 
 </manifest>

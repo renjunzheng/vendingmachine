@@ -3,26 +3,22 @@ package com.renjunzheng.vendingmachine;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Intent;
-import android.content.Loader;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.app.LoaderManager.LoaderCallbacks;
+
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -33,20 +29,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
- * A login screen that offers login via email/password.
+ * A register screen that offers register via email/password.
  */
-public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    private static final String TAG = "LoginScreenActivity";
+public class RegisterUser extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -61,7 +52,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
             "foo@example.com:hello", "bar@example.com:world"
     };
     /**
-     * Keep track of the login task to ensure we can cancel it if requested.
+     * Keep track of the register task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
@@ -74,12 +65,12 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login_screen);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        setContentView(R.layout.activity_register_user);
+        // Set up the register form.
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.register_email);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = (EditText) findViewById(R.id.password_first_time);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -91,7 +82,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.sign_up_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,8 +90,8 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mLoginFormView = findViewById(R.id.register_form);
+        mProgressView = findViewById(R.id.register_progress);
     }
 
     private void populateAutoComplete() {
@@ -120,7 +111,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
             Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new OnClickListener() {
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
                         @Override
                         @TargetApi(Build.VERSION_CODES.M)
                         public void onClick(View v) {
@@ -146,11 +137,10 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
         }
     }
 
-
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in or register the account specified by the register form.
      * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
+     * errors are presented and no actual register attempt is made.
      */
     private void attemptLogin() {
         if (mAuthTask != null) {
@@ -161,7 +151,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
-        // Store values at the time of the login attempt.
+        // Store values at the time of the register attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
@@ -187,30 +177,30 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
         }
 
         if (cancel) {
-            // There was an error; don't attempt login and focus the first
+            // There was an error; don't attempt register and focus the first
             // form field with an error.
             focusView.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
+            // perform the user register attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password, this);
+            mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
-        return email.contains("@");// && email.contains(".");
+        return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4; // &&
+        return password.length() > 4;
     }
 
     /**
-     * Shows the progress UI and hides the login form.
+     * Shows the progress UI and hides the register form.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -282,7 +272,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginScreen.this,
+                new ArrayAdapter<>(RegisterUser.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);
@@ -300,60 +290,30 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
     }
 
     /**
-     * Represents an asynchronous login/registration task used to authenticate
+     * Represents an asynchronous registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mPassword;
-        private Context mContext;
 
-        UserLoginTask(String email, String password, Context context) {
+        UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
-            mContext = context;
         }
 
-        final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
-
         @Override
-        protected Integer doInBackground(Void... params) {
-            // Not the most elegant way for checking if logged in I think.
-            // So basically I have one bool will be true once received server response regarding the validation
-            // but I have to use a timer set to 1000 ms so that it didn't check the boolean value too frequently
-            // then with the status code server send back, I can determine whether the password is correct.
-            // right now no matter what it will tell the password is wrong, instead of more accurate info.
+        protected Boolean doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
 
             try {
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                editor.putBoolean("login_checked", false);
-                editor.apply();
-                while (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("login_checked", false)) {
-                    Bundle data = new Bundle();
-                    // the action is used to distinguish
-                    // different message types on the server
-                    data.putString("action", "LOGIN");
-                    data.putString("email", mEmail);
-                    data.putString("passwd", mPassword);
-
-                    int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("msgId", 0);
-                    editor.putInt("msgId", storedMsgId++);
-                    editor.apply();
-
-                    String msgId = Integer.toString(storedMsgId);
-                    String projectId = getString(R.string.gcm_defaultSenderId);
-                    gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
-                    SystemClock.sleep(1000);
-                }
-                editor.putBoolean("login_checked", false);
-                editor.apply();
-                return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("login_status_code", 400);
-            } catch (IOException e) {
-                Log.e(TAG,"IO Exception");
-                return 400;
+                // Simulate network access.
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                return false;
             }
-            /*
+
             for (String credential : DUMMY_CREDENTIALS) {
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
@@ -361,31 +321,21 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
                     return pieces[1].equals(mPassword);
                 }
             }
-            */
+
+            // TODO: register the new account here.
+            return true;
         }
 
         @Override
-        protected void onPostExecute(final Integer returnCode) {
+        protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
 
-            switch (returnCode) {
-                case 400:
-                    mPasswordView.setError(getString(R.string.error_incorrect_password));
-                    mPasswordView.requestFocus();
-                    break;
-                case 200:
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                    editor.putBoolean("user_logged_in", true);
-                    editor.apply();
-                    Intent i = new Intent(LoginScreen.this, VMSelection.class);
-                    startActivity(i);
-                    finish();
-                    break;
-                case 300:
-                    Intent j = new Intent(LoginScreen.this, RegisterUser.class);
-                    startActivity(j);
-                    break;
+            if (success) {
+                finish();
+            } else {
+                mPasswordView.setError(getString(R.string.error_incorrect_password));
+                mPasswordView.requestFocus();
             }
         }
 

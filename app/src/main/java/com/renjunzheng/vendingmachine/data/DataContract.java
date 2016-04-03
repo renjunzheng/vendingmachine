@@ -45,7 +45,7 @@ public class DataContract {
         //id will increment automatically because of implementing BaseColumns
         public static final String TABLE_NAME = "user";
 
-        public static final String COLUMN_REAL_NAME = "real_name";
+        //public static final String COLUMN_REAL_NAME = "real_name";
         public static final String COLUMN_DISPLAY_NAME = "display_name";
         public static final String COLUMN_EMAIL = "email";
         public static final String COLUMN_MONEY_LEFT = "money_left";

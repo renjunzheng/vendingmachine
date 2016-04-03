@@ -81,9 +81,8 @@ public class MachineDetailFragment extends Fragment implements LoaderManager.Loa
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
                 if (cursor != null) {
-                    //Intent intent = new Intent(getActivity(), ItemDetail.class);
-                    //startActivity(intent);
-                    Toast.makeText(getActivity(), "clicked", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getActivity(), ItemDetail.class);
+                    startActivity(intent);
                 }
             }
         });

@@ -23,5 +23,14 @@
         completions."
     </string>
 
+    <string name="register_password">Password</string>
+    <string name="confirm_register_password">Confirm Password</string>
+    <string name="action_sign_up">Sign Up</string>
+    <string name="prompt_username">User Name</string>
+
+
     <bool name="user_logged_in">false</bool>
+    <string name="title_activity_register_user">RegisterUser</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="title_activity_item_detail">ItemDetail</string>
 </resources>
