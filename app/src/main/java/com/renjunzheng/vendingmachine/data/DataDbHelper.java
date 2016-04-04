@@ -14,7 +14,7 @@ import com.renjunzheng.vendingmachine.data.DataContract.PurchasedEntry;
 public class DataDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "data.db";
 
@@ -40,6 +40,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
 
                 ItemEntry.COLUMN_ITEM_NAME + " TEXT NOT NULL, " +
                 ItemEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
+                ItemEntry.COLUMN_PRICE + " TEXT NOT NULL, " +
                 ItemEntry.COLUMN_REMAINING_NUM + " INTEGER NOT NULL CHECK (" +
                 ItemEntry.COLUMN_REMAINING_NUM + " >0)" +
                 " );";

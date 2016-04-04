@@ -70,6 +70,7 @@ public class DataContract {
 
         public static final String COLUMN_ITEM_NAME = "item_name";
         public static final String COLUMN_REMAINING_NUM = "remaining_num";
+        public static final String COLUMN_PRICE = "item_price";
 
         // Short description and long description of the item.
         // e.g "sweet" vs "contains sugar".
@@ -78,6 +79,10 @@ public class DataContract {
 
         public static Uri buildItemUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildItemWithId(String id){
+            return CONTENT_URI.buildUpon().appendPath(id).build();
         }
 
         /*

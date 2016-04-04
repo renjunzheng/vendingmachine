@@ -188,7 +188,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 ContentValues newValues = new ContentValues();
                 newValues.put(DataContract.ItemEntry.COLUMN_REMAINING_NUM, infoJson.getInt("remaining_num"));
                 newValues.put(DataContract.ItemEntry.COLUMN_SHORT_DESC, infoJson.getString("short_desc"));
-
+                newValues.put(DataContract.ItemEntry.COLUMN_PRICE, infoJson.getString("item_price"));
                 newValues.put(DataContract.ItemEntry.COLUMN_ITEM_NAME, infoJson.getString("item_name"));
                 Uri returnedUri = getContentResolver().insert(DataContract.ItemEntry.CONTENT_URI,
                         newValues);
