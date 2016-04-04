@@ -2,6 +2,7 @@ package com.renjunzheng.vendingmachine;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.TextView;
  * Created by XPS on 2016/4/3.
  */
 public class ItemAdapter extends CursorAdapter {
+
+    private static final String TAG = "ItemAdapter";
     public ItemAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -42,7 +45,7 @@ public class ItemAdapter extends CursorAdapter {
     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.fragment_item_detail, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.list_item_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
         view.setTag(viewHolder);
         return view;
@@ -55,9 +58,12 @@ public class ItemAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // our view is pretty simple here --- just a text view
         // we'll keep the UI functional with a simple (and slow!) binding.
-
+        String name = cursor.getString(ItemDetailFragment.COL_ITEM_NAME);
+        Log.i(TAG,name);
+        int drawableid= Utility.getArtResourceForMerchandise(name);
+        Log.i(TAG,Integer.toString(drawableid));
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.iconView.setImageResource(Utility.getArtResourceForMerchandise(cursor.getString(ItemDetailFragment.COL_ITEM_NAME)));
+        viewHolder.iconView.setImageResource(drawableid);
         viewHolder.descriptionView.setText(cursor.getString(ItemDetailFragment.COL_ITEM_SHORT_DESC));
         viewHolder.quantityView.setText(cursor.getString(ItemDetailFragment.COL_ITEM_REMAINING_NUM));
         viewHolder.nameView.setText(cursor.getString(ItemDetailFragment.COL_ITEM_NAME));

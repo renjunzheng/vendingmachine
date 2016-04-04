@@ -81,15 +81,12 @@ public class MachineDetailFragment extends Fragment implements LoaderManager.Loa
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                String temp1 = cursor.getString(COL_ITEM_ID);
+                String temp1 = cursor.getString(COL_ITEM_NAME);
                 Log.i(TAG,"t1: "+temp1);
-                /*String temp2 = temp1.split(".")[1];
-
-                Log.i(TAG,"t2: "+temp2);*/
                 if (cursor != null) {
-                    /*Intent intent = new Intent(getActivity(), ItemDetail.class)
-                            .setData(DataContract.ItemEntry.buildItemWithId(temp1));
-                    startActivity(intent);*/
+                    Intent intent = new Intent(getActivity(), ItemDetail.class)
+                            .setData(DataContract.ItemEntry.buildItemWithName(temp1));
+                    startActivity(intent);
                 }
             }
         });

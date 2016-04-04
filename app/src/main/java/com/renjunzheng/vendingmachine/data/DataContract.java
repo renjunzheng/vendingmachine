@@ -80,11 +80,13 @@ public class DataContract {
         public static Uri buildItemUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
-
-        public static Uri buildItemWithId(String id){
-            return CONTENT_URI.buildUpon().appendPath(id).build();
+        /*
+        public static Uri buildItemWithId(String name){
+            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_ITEM_NAME, name).build();
+        }*/
+        public static Uri buildItemWithName(String name){
+            return CONTENT_URI.buildUpon().appendPath(name).build();
         }
-
         /*
         public static Uri buildWeatherLocation(String locationSetting) {
             return null;

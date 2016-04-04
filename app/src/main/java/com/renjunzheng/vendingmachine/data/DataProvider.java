@@ -8,11 +8,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by XPS on 2016/3/26.
  */
 public class DataProvider extends ContentProvider {
+    private static final String TAG = "DataProvider";
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -21,6 +23,7 @@ public class DataProvider extends ContentProvider {
     static final int USER = 1;
     static final int ITEM = 2;
     static final int PURCHASED = 3;
+    static final int ITEM_WITH_NAME =4;
 
     private static final SQLiteQueryBuilder sPurchasedJoinItemQueryBuilder;
 
@@ -112,6 +115,7 @@ public class DataProvider extends ContentProvider {
         matcher.addURI(authority, DataContract.PATH_USER, USER);
         matcher.addURI(authority, DataContract.PATH_ITEM, ITEM);
         matcher.addURI(authority, DataContract.PATH_PURCHASED, PURCHASED);
+        matcher.addURI(authority, DataContract.PATH_ITEM + "/*", ITEM_WITH_NAME);
 
         // 3) Return the new matcher!
         return matcher;
@@ -130,6 +134,8 @@ public class DataProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
+            case ITEM_WITH_NAME:
+                return DataContract.ItemEntry.CONTENT_ITEM_TYPE;
             case USER:
                 return DataContract.UserEntry.CONTENT_TYPE;
             case ITEM:
@@ -141,13 +147,37 @@ public class DataProvider extends ContentProvider {
         }
     }
 
+
+    private Cursor getItemByName(Uri uri, String[] projection, String sortOrder){
+        String itemName = uri.getPathSegments().get(1);
+        return mOpenHelper.getReadableDatabase().query(
+                DataContract.ItemEntry.TABLE_NAME,
+                projection,
+                DataContract.ItemEntry.TABLE_NAME+"."+DataContract.ItemEntry.COLUMN_ITEM_NAME+"=?",
+                new String[]{itemName},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+
+
+
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
+        Log.i(TAG, "uri: " + uri);
+
         switch (sUriMatcher.match(uri)) {
+            case ITEM_WITH_NAME:{
+                retCursor = getItemByName(uri, projection, sortOrder);
+                break;
+            }
+
             case USER: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         DataContract.UserEntry.TABLE_NAME,
@@ -186,7 +216,6 @@ public class DataProvider extends ContentProvider {
                 );
                 break;
             }
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
