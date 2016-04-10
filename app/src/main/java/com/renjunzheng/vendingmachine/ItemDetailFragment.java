@@ -3,9 +3,12 @@ package com.renjunzheng.vendingmachine;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -17,9 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.annotation.TargetApi;
@@ -42,7 +47,7 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
     private View mPurchaseFormView;
     private View mProgressView;
     private UserPurchaseTask mPurchaseTask = null;
-
+    private EditText mQuantity;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -90,32 +95,19 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
         mListView = (ListView) rootView.findViewById(R.id.listview_item);
         mListView.setAdapter(mItemAdapter);
 
-        /*
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mProgressView = rootView.findViewById(R.id.purchase_progress);
+        mPurchaseFormView = rootView.findViewById(R.id.item_detail_form);
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-                // if it cannot seek to that position.
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                if (cursor != null) {
-                    Intent intent = new Intent(getActivity(), ItemDetail.class);
-                    startActivity(intent);
-                }
-            }
-        });
-        */
+        mQuantity = (EditText) rootView.findViewById(R.id.purchase_num);
+
         Button button;
 
-        button = (Button) rootView.findViewById(R.id.purchase_button);
+        button = (Button) rootView.findViewById(R.id.buy_button);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 attemptPurchase();
             }
         });
-
-        mProgressView = rootView.findViewById(R.id.purchase_progress);
-        mPurchaseFormView = rootView.findViewById(R.id.item_detail_form);
 
         return rootView;
     }
@@ -158,54 +150,55 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             return;
         }
 
+        TextView mTextView = (TextView) mListView.findViewById(R.id.detail_name_textview);
+
+        if(mQuantity.getText().toString() == null || mQuantity.getText().toString().isEmpty()) {
+            mQuantity.setError("Invalid quantity to purchase");
+            mQuantity.requestFocus();
+            return;
+        }
         boolean enough = false;
 
+
+
         if (!enough) {
-            // There was not enough money to buy, Toast
-            Toast.makeText(getActivity(),"You don't have enough money to make purchase!", Toast.LENGTH_SHORT).show();
+            mQuantity.setError("Don't have enough money");
+            mQuantity.requestFocus();
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user purchase.
             showProgress(true);
-            int itemid = 0;
-            mPurchaseTask = new UserPurchaseTask(itemid, getContext());
+            mPurchaseTask = new UserPurchaseTask(mTextView.getText().toString(), getContext(), Integer.parseInt(mQuantity.getText().toString()));
             mPurchaseTask.execute((Void) null);
         }
     }
 
     public class UserPurchaseTask extends AsyncTask<Void, Void, Integer> {
-        private int mitemid;
+        private String mName;
+        private int mQuant;
         private Context mContext;
 
-        UserPurchaseTask(int itemid, Context context) {
-            mitemid = itemid;
+        UserPurchaseTask(String name, Context context, int quantity) {
+            mName = name;
             mContext = context;
+            mQuant = quantity;
         }
 
         final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(mContext);
 
         @Override
         protected Integer doInBackground(Void... params) {
-            // Not the most elegant way for checking if logged in I think.
-            // So basically I have one bool will be true once received server response regarding the validation
-            // but I have to use a timer set to 1000 ms so that it didn't check the boolean value too frequently
-            // then with the status code server send back, I can determine whether the password is correct.
-            // right now no matter what it will tell the password is wrong, instead of more accurate info.
-
-            /*try {
-
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                editor.putBoolean("login_checked", false);
+            try {
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
+                editor.putBoolean("purchase_verified", false);
                 editor.apply();
-                while (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("login_checked", false)) {
+                while (!PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("purchase_verified", false)) {
                     Bundle data = new Bundle();
-                    // the action is used to distinguish
-                    // different message types on the server
-                    data.putString("action", "LOGIN");
-                    data.putString("email", mEmail);
-                    data.putString("passwd", mPassword);
+                    data.putString("action", "PURCHASE");
+                    data.putString("item_name", mName);
+                    data.putInt("quantity", mQuant);
 
-                    int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("msgId", 0);
+                    int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getInt("msgId", 0);
                     editor.putInt("msgId", storedMsgId++);
                     editor.apply();
 
@@ -214,14 +207,13 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
                     gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
                     SystemClock.sleep(1000);
                 }
-                editor.putBoolean("login_checked", false);
+                editor.putBoolean("purchase_verified", false);
                 editor.apply();
-                return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("login_status_code", 400);
+                return PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getInt("login_status_code", 400);
             } catch (IOException e) {
                 Log.e(TAG,"IO Exception");
                 return 400;
-            }*/
-            return 0;
+            }
         }
 
         @Override

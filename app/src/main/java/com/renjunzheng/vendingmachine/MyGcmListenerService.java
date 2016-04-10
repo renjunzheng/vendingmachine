@@ -94,6 +94,8 @@ public class MyGcmListenerService extends GcmListenerService {
             updateStorageInfo(updated_info);
         }else if(action.equals("UPDATE_PURCHASE_INFO")){
             updatePurchaseInfo("temp");
+        }else if(action.equals("CONFIRM_PURCHASE")){
+
         }
         // [END_EXCLUDE]
     }
