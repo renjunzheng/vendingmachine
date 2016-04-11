@@ -329,21 +329,21 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
                 editor.putBoolean("login_checked", false);
                 editor.apply();
+                Bundle data = new Bundle();
+                // the action is used to distinguish
+                // different message types on the server
+                data.putString("action", "LOGIN");
+                data.putString("email", mEmail);
+                data.putString("passwd", mPassword);
+
+                int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("msgId", 0);
+                editor.putInt("msgId", storedMsgId++);
+                editor.apply();
+
+                String msgId = Integer.toString(storedMsgId);
+                String projectId = getString(R.string.gcm_defaultSenderId);
+                gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
                 while (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("login_checked", false)) {
-                    Bundle data = new Bundle();
-                    // the action is used to distinguish
-                    // different message types on the server
-                    data.putString("action", "LOGIN");
-                    data.putString("email", mEmail);
-                    data.putString("passwd", mPassword);
-
-                    int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt("msgId", 0);
-                    editor.putInt("msgId", storedMsgId++);
-                    editor.apply();
-
-                    String msgId = Integer.toString(storedMsgId);
-                    String projectId = getString(R.string.gcm_defaultSenderId);
-                    gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
                     SystemClock.sleep(1000);
                 }
                 editor.putBoolean("login_checked", false);
@@ -377,6 +377,7 @@ public class LoginScreen extends AppCompatActivity implements LoaderCallbacks<Cu
                 case 200:
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
                     editor.putBoolean("user_logged_in", true);
+                    editor.putString("user_email", mEmail);
                     editor.apply();
                     Intent i = new Intent(LoginScreen.this, VMSelection.class);
                     startActivity(i);

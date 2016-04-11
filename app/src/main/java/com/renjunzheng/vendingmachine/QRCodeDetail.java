@@ -21,6 +21,8 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 
+import java.util.HashMap;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -38,6 +40,22 @@ public class QRCodeDetail extends AppCompatActivity {
 
     public final static int WHITE = 0xFFFFFFFF;
     public final static int BLACK = 0xFF000000;
+
+    private static final HashMap<Character, String> myMap;
+    static
+    {
+        myMap = new HashMap<Character, String>();
+        myMap.put('0', "d");
+        myMap.put('1', "g");
+        myMap.put('2', "i");
+        myMap.put('3', "e");
+        myMap.put('4', "z");
+        myMap.put('5', "v");
+        myMap.put('6', "f");
+        myMap.put('7', "x");
+        myMap.put('8', "c");
+        myMap.put('9', "m");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +75,7 @@ public class QRCodeDetail extends AppCompatActivity {
         Toast.makeText(this, "Tap on the QR code so QR scanner can have a better image.", Toast.LENGTH_LONG).show();
 
         try {
-            Bitmap bitmap = encodeAsBitmap(code);
+            Bitmap bitmap = encodeAsBitmap("uvm:"+myMap.get(code.charAt(0))+myMap.get(code.charAt(1))+myMap.get(code.charAt(2))+myMap.get(code.charAt(3)));
             if(bitmap == null) throw new RuntimeException("Cannot generate QR code");
             else mImageView.setImageBitmap(bitmap);
         } catch (WriterException e) {

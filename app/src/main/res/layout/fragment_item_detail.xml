@@ -8,6 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.renjunzheng.vendingmachine.ItemDetailFragment"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
     tools:showIn="@layout/activity_item_detail">

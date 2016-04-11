@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -33,6 +34,7 @@ import android.os.Build;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.renjunzheng.vendingmachine.data.DataContract;
+import com.renjunzheng.vendingmachine.data.DataDbHelper;
 
 import java.io.IOException;
 
@@ -53,16 +55,14 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
 
     private static final String[] ITEM_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
-            // the content provider joins the location & weather tables in the background
+            // the content provider joins the user,item,purchased tables in the background
             // (both have an _id column)
-            // On the one hand, that's annoying.  On the other, you can search the weather table
-            // using the location set by the user, which is only in the Location table.
-            // So the convenience is worth it.
+            /*
             DataContract.ItemEntry.TABLE_NAME + "." + DataContract.ItemEntry._ID,
             DataContract.ItemEntry.COLUMN_ITEM_NAME,
             DataContract.ItemEntry.COLUMN_REMAINING_NUM,
             DataContract.ItemEntry.COLUMN_SHORT_DESC,
-            DataContract.ItemEntry.COLUMN_PRICE
+            DataContract.ItemEntry.COLUMN_PRICE*/
     };
 
     static final int COL_ITEM_ID = 0;
@@ -157,11 +157,12 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             mQuantity.requestFocus();
             return;
         }
+        
         boolean enough = false;
 
 
 
-        if (!enough) {
+        if (enough) {
             mQuantity.setError("Don't have enough money");
             mQuantity.requestFocus();
         } else {
@@ -192,12 +193,16 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).edit();
                 editor.putBoolean("purchase_verified", false);
                 editor.apply();
-                while (!PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("purchase_verified", false)) {
-                    Bundle data = new Bundle();
-                    data.putString("action", "PURCHASE");
-                    data.putString("item_name", mName);
-                    data.putInt("quantity", mQuant);
-
+                Bundle data = new Bundle();
+                data.putString("action", "PURCHASE");
+                data.putString("item_name", mName);
+                data.putString("quantity", Integer.toString(mQuant));
+                Log.i(TAG,"quantity:" + Integer.toString(mQuant));
+                String email = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getString("user_email", "admin@uvm.com");
+                if(email.equals("admin@uvm.com"))
+                    return -3;
+                else {
+                    data.putString("email", email);
                     int storedMsgId = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getInt("msgId", 0);
                     editor.putInt("msgId", storedMsgId++);
                     editor.apply();
@@ -205,14 +210,16 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
                     String msgId = Integer.toString(storedMsgId);
                     String projectId = getString(R.string.gcm_defaultSenderId);
                     gcm.send(projectId + "@gcm.googleapis.com", msgId, data);
-                    SystemClock.sleep(1000);
+                    while (!PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getBoolean("purchase_verified", false)) {
+                        SystemClock.sleep(1000);
+                    }
+                    editor.putBoolean("purchase_verified", false);
+                    editor.apply();
+                    return PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getInt("purchase_status", -4);
                 }
-                editor.putBoolean("purchase_verified", false);
-                editor.apply();
-                return PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext()).getInt("login_status_code", 400);
             } catch (IOException e) {
                 Log.e(TAG,"IO Exception");
-                return 400;
+                return -5;
             }
         }
 
@@ -221,16 +228,13 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             mPurchaseTask = null;
             showProgress(false);
 
-            switch (returnCode) {
-                case 400:
-
-                    break;
-                case 200:
-
-                    break;
-                default:
-                    Toast.makeText(getActivity(), "Unable to process your purchase now", Toast.LENGTH_SHORT).show();
-                    return;
+            if(returnCode > 0){
+                Toast.makeText(getActivity(), "Your purchase has been processed! Receipt Code is: " + Integer.toString(returnCode), Toast.LENGTH_LONG).show();
+            }else if(returnCode == -1){
+                mQuantity.setError("Don't have enough money");
+                mQuantity.requestFocus();
+            }else{
+                Toast.makeText(getActivity(), "Unable to process your purchase now", Toast.LENGTH_SHORT).show();
             }
         }
     }

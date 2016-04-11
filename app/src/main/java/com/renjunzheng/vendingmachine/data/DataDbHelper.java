@@ -14,7 +14,7 @@ import com.renjunzheng.vendingmachine.data.DataContract.PurchasedEntry;
 public class DataDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 6;
 
     static final String DATABASE_NAME = "data.db";
 
@@ -31,9 +31,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 UserEntry.COLUMN_EMAIL + " TEXT UNIQUE NOT NULL, " +
                 //UserEntry.COLUMN_REAL_NAME + " TEXT NOT NULL, " +
                 UserEntry.COLUMN_DISPLAY_NAME + " TEXT NOT NULL, " +
-                UserEntry.COLUMN_MONEY_LEFT + " INTEGER NOT NULL CHECK (" +
-                UserEntry.COLUMN_MONEY_LEFT + " >0)" +
-                " );";
+                UserEntry.COLUMN_MONEY_LEFT + " FLOAT NOT NULL);";
 
         final String SQL_CREATE_ITEM_TABLE = "CREATE TABLE " + ItemEntry.TABLE_NAME + " (" +
                 ItemEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -41,9 +39,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
                 ItemEntry.COLUMN_ITEM_NAME + " TEXT NOT NULL, " +
                 ItemEntry.COLUMN_SHORT_DESC + " TEXT NOT NULL, " +
                 ItemEntry.COLUMN_PRICE + " TEXT NOT NULL, " +
-                ItemEntry.COLUMN_REMAINING_NUM + " INTEGER NOT NULL CHECK (" +
-                ItemEntry.COLUMN_REMAINING_NUM + " >0)" +
-                " );";
+                ItemEntry.COLUMN_REMAINING_NUM + " INTEGER NOT NULL);";
 
         final String SQL_CREATE_PURCHASED_TABLE = "CREATE TABLE " + PurchasedEntry.TABLE_NAME + " (" +
                 PurchasedEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +

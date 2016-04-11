@@ -54,6 +54,10 @@ public class DataContract {
         public static Uri buildUserUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+        public static Uri buildUserPurchase(String email){
+            return CONTENT_URI.buildUpon().appendPath(email).build();
+        }
     }
 
     /* Inner class that defines the table contents of the item table */

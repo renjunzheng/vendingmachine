@@ -3,6 +3,7 @@ package com.renjunzheng.vendingmachine.data;
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,80 +25,31 @@ public class DataProvider extends ContentProvider {
     static final int ITEM = 2;
     static final int PURCHASED = 3;
     static final int ITEM_WITH_NAME =4;
+    static final int USER_PURCHASE = 5;
 
     private static final SQLiteQueryBuilder sPurchasedJoinItemQueryBuilder;
 
     static{
         sPurchasedJoinItemQueryBuilder = new SQLiteQueryBuilder();
 
-        //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
+
         sPurchasedJoinItemQueryBuilder.setTables(
                 DataContract.PurchasedEntry.TABLE_NAME + " INNER JOIN " +
                         DataContract.ItemEntry.TABLE_NAME +
                         " ON " + DataContract.PurchasedEntry.TABLE_NAME +
                         "." + DataContract.PurchasedEntry.COLUMN_ITEM_KEY +
                         " = " + DataContract.ItemEntry.TABLE_NAME +
-                        "." + DataContract.ItemEntry._ID);
-    }
-    /*
-    //location.location_setting = ?
-    private static final String sLocationSettingSelection =
-            DataContract.LocationEntry.TABLE_NAME+
-                    "." + DataContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? ";
+                        "." + DataContract.ItemEntry._ID +
+                        " INNER JOIN " +
+                        DataContract.UserEntry.TABLE_NAME + " ON " +
+                        DataContract.PurchasedEntry.TABLE_NAME +
+                        "." + DataContract.PurchasedEntry.COLUMN_USER_KEY +
+                        " = " + DataContract.UserEntry.TABLE_NAME +
+                        "." + DataContract.UserEntry._ID
 
-    //location.location_setting = ? AND date >= ?
-    private static final String sLocationSettingWithStartDateSelection =
-            DataContract.LocationEntry.TABLE_NAME+
-                    "." + DataContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    DataContract.UserEntry.COLUMN_DATE + " >= ? ";
-
-    //location.location_setting = ? AND date = ?
-    private static final String sLocationSettingAndDaySelection =
-            DataContract.LocationEntry.TABLE_NAME +
-                    "." + DataContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                    DataContract.UserEntry.COLUMN_DATE + " = ? ";
-
-    private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = DataContract.UserEntry.getLocationSettingFromUri(uri);
-        long startDate = DataContract.UserEntry.getStartDateFromUri(uri);
-
-        String[] selectionArgs;
-        String selection;
-
-        if (startDate == 0) {
-            selection = sLocationSettingSelection;
-            selectionArgs = new String[]{locationSetting};
-        } else {
-            selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
-            selection = sLocationSettingWithStartDateSelection;
-        }
-
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
         );
     }
 
-    private Cursor getWeatherByLocationSettingAndDate(
-            Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = DataContract.UserEntry.getLocationSettingFromUri(uri);
-        long date = DataContract.UserEntry.getDateFromUri(uri);
-
-        return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
-                projection,
-                sLocationSettingAndDaySelection,
-                new String[]{locationSetting, Long.toString(date)},
-                null,
-                null,
-                sortOrder
-        );
-    }
-    */
     /*
         Students: Here is where you need to create the UriMatcher. This UriMatcher will
         match each URI to the WEATHER, WEATHER_WITH_LOCATION, WEATHER_WITH_LOCATION_AND_DATE,
@@ -116,9 +68,25 @@ public class DataProvider extends ContentProvider {
         matcher.addURI(authority, DataContract.PATH_ITEM, ITEM);
         matcher.addURI(authority, DataContract.PATH_PURCHASED, PURCHASED);
         matcher.addURI(authority, DataContract.PATH_ITEM + "/*", ITEM_WITH_NAME);
-
+        matcher.addURI(authority, DataContract.PATH_USER + "/*", USER_PURCHASE);
         // 3) Return the new matcher!
         return matcher;
+    }
+
+
+    private Cursor getPurchaseInfoByUserID(Uri uri, String[] projection, String sortOrder) {
+        String selection = DataContract.UserEntry.TABLE_NAME + "." + DataContract.UserEntry.COLUMN_EMAIL + " = ?";
+        String user_email = uri.getPathSegments().get(1);
+        Log.i(TAG, "user_mail:" + user_email);
+        String[] selectionArgs = new String [] {user_email};
+        return sPurchasedJoinItemQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
     }
 
     @Override
@@ -134,6 +102,8 @@ public class DataProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
+            //case USER_PURCHASE:
+            //    return;
             case ITEM_WITH_NAME:
                 return DataContract.ItemEntry.CONTENT_ITEM_TYPE;
             case USER:
@@ -173,11 +143,14 @@ public class DataProvider extends ContentProvider {
         Log.i(TAG, "uri: " + uri);
 
         switch (sUriMatcher.match(uri)) {
+            case USER_PURCHASE:{
+                retCursor = getPurchaseInfoByUserID(uri, projection, sortOrder);
+                break;
+            }
             case ITEM_WITH_NAME:{
                 retCursor = getItemByName(uri, projection, sortOrder);
                 break;
             }
-
             case USER: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         DataContract.UserEntry.TABLE_NAME,

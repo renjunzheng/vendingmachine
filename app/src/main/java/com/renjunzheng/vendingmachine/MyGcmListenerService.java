@@ -24,6 +24,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
@@ -93,13 +94,21 @@ public class MyGcmListenerService extends GcmListenerService {
             String updated_info = data.getString("updated_info");
             updateStorageInfo(updated_info);
         }else if(action.equals("UPDATE_PURCHASE_INFO")){
-            updatePurchaseInfo("temp");
+            String updated_info = data.getString("updated_info");
+            updatePurchaseInfo(updated_info);
         }else if(action.equals("CONFIRM_PURCHASE")){
-
+            confirmPurchase(Integer.parseInt(data.getString("purchase_status")));
         }
         // [END_EXCLUDE]
     }
     // [END receive_message]
+
+    private void confirmPurchase(int purchase_status){
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+        editor.putBoolean("purchase_verified", true);
+        editor.putInt("purchase_status", purchase_status);
+        editor.apply();
+    }
 
     private void updatePurchaseInfo(String purchaseInfo){
         try {
@@ -110,24 +119,42 @@ public class MyGcmListenerService extends GcmListenerService {
             database.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DataContract.PurchasedEntry.TABLE_NAME + "'");
 
             JSONArray valueArray = new JSONArray(purchaseInfo);
+            Log.i(TAG, "the valueArray length: " + Integer.toString(valueArray.length()));
             for(int lc = 0; lc < valueArray.length(); ++ lc){
                 JSONObject infoJson = valueArray.getJSONObject(lc);
                 String item_name = infoJson.getString("item_name");
+                database.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + DataContract.PurchasedEntry.TABLE_NAME + "'");
+
                 //query based on this item_name and get item id
                 //currently if queried has no such item in current database then don't insert to purchase table
-                //find user id using the email returned
+                //find user id using the stored email
+                String[] itemProj = new String[]{DataContract.ItemEntry._ID};
+                String[] itemSelArgs = new String[]{item_name};
+                Cursor itemIDCursor = database.query(DataContract.ItemEntry.TABLE_NAME,itemProj, DataContract.ItemEntry.COLUMN_ITEM_NAME + " = ?", itemSelArgs,
+                        null, null, null);
+                itemIDCursor.moveToNext();
+                int itemID = itemIDCursor.getInt(0);
+                String[] userProj = new String[]{DataContract.UserEntry._ID};
+                String user_email = infoJson.getString("email");
+                String[] userSelArgs = new String[]{user_email};
+                Cursor userIDCursor = database.query(DataContract.UserEntry.TABLE_NAME,userProj, DataContract.UserEntry.COLUMN_EMAIL + " = ?", userSelArgs,
+                        null, null, null);
+                userIDCursor.moveToNext();
+                Log.i(TAG, "userID: "+user_email);
+                int userID = userIDCursor.getInt(0);
+                Log.i(TAG, "itemID: "+itemID);
+                Log.i(TAG, "userID: "+userID);
 
-                /*
-                //everything is the same as following code
                 ContentValues newValues = new ContentValues();
-                newValues.put(DataContract.ItemEntry.COLUMN_REMAINING_NUM, infoJson.getInt("remaining_num"));
-                newValues.put(DataContract.ItemEntry.COLUMN_SHORT_DESC, infoJson.getString("short_desc"));
-
-                newValues.put(DataContract.ItemEntry.COLUMN_ITEM_NAME, infoJson.getString("item_name"));
-                Uri returnedUri = getContentResolver().insert(DataContract.ItemEntry.CONTENT_URI,
+                newValues.put(DataContract.PurchasedEntry.COLUMN_ITEM_KEY, itemID);
+                newValues.put(DataContract.PurchasedEntry.COLUMN_USER_KEY, userID);
+                newValues.put(DataContract.PurchasedEntry.COLUMN_ORDER_TIME, infoJson.getString("order_time"));
+                newValues.put(DataContract.PurchasedEntry.COLUMN_PICK_UP_TIME, infoJson.getString("pickup_time"));
+                newValues.put(DataContract.PurchasedEntry.COLUMN_QUANTITY, infoJson.getString("quantity"));
+                newValues.put(DataContract.PurchasedEntry.COLUMN_RECEIPT_NUM, infoJson.getString("receipt"));
+                Uri returnedUri = getContentResolver().insert(DataContract.PurchasedEntry.CONTENT_URI,
                         newValues);
                 Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
-                */
             }
 
             database.close();
@@ -140,32 +167,31 @@ public class MyGcmListenerService extends GcmListenerService {
     private void loginFeedback(String login_status_code, Bundle data){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
         editor.putBoolean("login_checked", true);
-        editor.putInt("login_status_code", Integer.parseInt(login_status_code));
-        Log.i(TAG, "status_code returned: " + login_status_code);
+        int returnCode = Integer.parseInt(login_status_code);
+        editor.putInt("login_status_code", returnCode);
         editor.apply();
 
-        /*
-        Should insert or update user table based on email. Because money and display name might have changed
-        String user_info = data.getString("user_info");
-        ContentValues newValues = new ContentValues();
-        newValues.put(DataContract.UserEntry.COLUMN_DISPLAY_NAME, user_info.getInt("display_name"));
-        newValues.put(DataContract.UserEntry.COLUMN_MONEY_LEFT, user_info.getString("money_left"));
+        if(returnCode == 200) {
+            ContentValues newValues = new ContentValues();
+            newValues.put(DataContract.UserEntry.COLUMN_DISPLAY_NAME, data.getString("real_name"));
+            newValues.put(DataContract.UserEntry.COLUMN_MONEY_LEFT, data.getString("balance"));
 
-        String selection = DataContract.UserEntry.COLUMN_EMAIL + " =?";
-        String[] selectionArgs = {user_info.getString("email")};
-        int rowUpdated = getContentResolver().update(DataContract.UserEntry.CONTENT_URI,
-                newValues,
-                selection,
-                selectionArgs);
-        if(rowUpdated == 0){
-            newValues.put(DataContract.UserEntry.COLUMN_EMAIL, user_info.getString("email"));
-            Uri returnedUri = getContentResolver().insert(DataContract.UserEntry.CONTENT_URI,
-                    newValues);
-            Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
-        }else{
-            Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
+            String selection = DataContract.UserEntry.COLUMN_EMAIL + " =?";
+            String[] selectionArgs = {data.getString("email")};
+            int rowUpdated = getContentResolver().update(DataContract.UserEntry.CONTENT_URI,
+                    newValues,
+                    selection,
+                    selectionArgs);
+            if(rowUpdated == 0){
+                newValues.put(DataContract.UserEntry.COLUMN_EMAIL, data.getString("email"));
+                Uri returnedUri = getContentResolver().insert(DataContract.UserEntry.CONTENT_URI,
+                        newValues);
+                Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
+            }else{
+                Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
+            }
+
         }
-         */
     }
 
     private void updateStorageInfo(String updated_info) {
