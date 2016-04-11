@@ -3,6 +3,8 @@ package com.renjunzheng.vendingmachine;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -19,6 +21,10 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.renjunzheng.vendingmachine.data.DataContract;
+import com.renjunzheng.vendingmachine.data.DataDbHelper;
 
 public class VMSelection extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -42,7 +48,24 @@ public class VMSelection extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        View header=navigationView.getHeaderView(0);
+        TextView navEmail = (TextView) header.findViewById(R.id.navEmail);
+        String email = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("user_email", "admin@uvm.com");
+        navEmail.setText(email);
+        TextView navName = (TextView) header.findViewById(R.id.navName);
+        if(email.equals("admin@uvm.com")){
+            navName.setText("Login first");
+        } else{
+            DataDbHelper dbHelper = new DataDbHelper(this);
+            SQLiteDatabase database = dbHelper.getReadableDatabase();
+            String[] userProj = new String[]{DataContract.UserEntry.COLUMN_DISPLAY_NAME};
+            String[] userSelArgs = new String[]{email};
+            Cursor userIDCursor = database.query(DataContract.UserEntry.TABLE_NAME,userProj, DataContract.UserEntry.COLUMN_EMAIL + " = ?", userSelArgs,
+                    null, null, null);
+            userIDCursor.moveToNext();
+            String userID = userIDCursor.getString(0);
+            navName.setText(userID);
+        }
     }
 
     @Override
