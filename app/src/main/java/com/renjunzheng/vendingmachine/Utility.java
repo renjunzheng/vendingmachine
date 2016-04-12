@@ -11,15 +11,17 @@ public class Utility {
      */
     public static int getArtResourceForMerchandise(String merchandiseName) {
 
-        if(merchandiseName.equals("hershey"))
-            return R.drawable.hershey;
-        else if(merchandiseName.equals("kitkat"))
-            return R.drawable.kitkat;
-        else if(merchandiseName.equals("reeses"))
-            return R.drawable.reeses;
-        else if(merchandiseName.equals("snickers"))
-            return R.drawable.snickers;
-        else
-            return 0;
+        switch (merchandiseName){
+            case "hershey":
+                return R.drawable.hershey;
+            case "kitkat":
+                return R.drawable.kitkat;
+            case "reeses":
+                return R.drawable.reeses;
+            case "snickers":
+                return R.drawable.snickers;
+            default:
+                return 0;
+        }
     }
 }

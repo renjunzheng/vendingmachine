@@ -1,8 +1,5 @@
 package com.renjunzheng.vendingmachine.data;
 
-/**
- * Created by XPS on 2016/3/26.
- */
 import android.provider.BaseColumns;
 import android.text.format.Time;
 import android.content.ContentResolver;

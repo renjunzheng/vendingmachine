@@ -87,11 +87,10 @@ public class RegistrationIntentService extends IntentService {
                     Bundle data = new Bundle();
                     // the account is used for keeping
                     // track of user notifications
-                    data.putString("account", "well");
+                    data.putString("email", PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("user_email", "admin@uvm.com"));
                     // the action is used to distinguish
                     // different message types on the server
                     data.putString("action", "INITIALIZE_TOKEN");
-                    data.putString("message", "having fun");
 
                     //String msgId = Integer.toString(getNextMsgId());
                     String projectId = getString(R.string.gcm_defaultSenderId);

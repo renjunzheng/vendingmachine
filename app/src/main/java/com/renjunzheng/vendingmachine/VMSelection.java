@@ -65,6 +65,8 @@ public class VMSelection extends AppCompatActivity
             userIDCursor.moveToNext();
             String userID = userIDCursor.getString(0);
             navName.setText(userID);
+            database.close();
+            dbHelper.close();
         }
     }
 

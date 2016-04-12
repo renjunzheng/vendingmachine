@@ -61,13 +61,13 @@ public class MyGcmListenerService extends GcmListenerService {
         Log.d(TAG, "action: " + data.getString("action"));
 
 
-
+        /*
         if (from.startsWith("/topics/")) {
             // message received from some topic.
         } else {
             // normal downstream message.
         }
-
+        */
         // [START_EXCLUDE]
         /**
          * Production applications would usually process the message here.
@@ -81,23 +81,28 @@ public class MyGcmListenerService extends GcmListenerService {
          * that a message was received.
          */
 
-
-        if(action.equals("NOTIFICATION")) {
-            String message = data.getString("message");
-            sendNotification(message);
-        }else if(action.equals("CONFIRM_REGISTER")){
-
-        }else if(action.equals("CONFIRM_LOG_IN")){
-            String login_status_code = data.getString("status_code");
-            loginFeedback(login_status_code, data);
-        }else if(action.equals("UPDATE_STORAGE_INFO")){
-            String updated_info = data.getString("updated_info");
-            updateStorageInfo(updated_info);
-        }else if(action.equals("UPDATE_PURCHASE_INFO")){
-            String updated_info = data.getString("updated_info");
-            updatePurchaseInfo(updated_info);
-        }else if(action.equals("CONFIRM_PURCHASE")){
-            confirmPurchase(Integer.parseInt(data.getString("purchase_status")));
+        if(action != null) {
+            switch (action) {
+                case "NOTIFICATION":
+                    String message = data.getString("message");
+                    sendNotification(message);
+                    break;
+                case "CONFIRM_LOG_IN":
+                    String login_status_code = data.getString("status_code");
+                    loginFeedback(login_status_code, data);
+                    break;
+                case "UPDATE_STORAGE_INFO":
+                    String updated_info1 = data.getString("updated_info");
+                    updateStorageInfo(updated_info1);
+                    break;
+                case "UPDATE_PURCHASE_INFO":
+                    String updated_info2 = data.getString("updated_info");
+                    updatePurchaseInfo(updated_info2);
+                    break;
+                case "CONFIRM_PURCHASE":
+                    confirmPurchase(Integer.parseInt(data.getString("purchase_status")));
+                    break;
+            }
         }
         // [END_EXCLUDE]
     }
@@ -134,6 +139,7 @@ public class MyGcmListenerService extends GcmListenerService {
                         null, null, null);
                 itemIDCursor.moveToNext();
                 int itemID = itemIDCursor.getInt(0);
+                itemIDCursor.close();
                 String[] userProj = new String[]{DataContract.UserEntry._ID};
                 String user_email = infoJson.getString("email");
                 String[] userSelArgs = new String[]{user_email};
@@ -144,7 +150,7 @@ public class MyGcmListenerService extends GcmListenerService {
                 int userID = userIDCursor.getInt(0);
                 Log.i(TAG, "itemID: "+itemID);
                 Log.i(TAG, "userID: "+userID);
-
+                userIDCursor.close();
                 ContentValues newValues = new ContentValues();
                 newValues.put(DataContract.PurchasedEntry.COLUMN_ITEM_KEY, itemID);
                 newValues.put(DataContract.PurchasedEntry.COLUMN_USER_KEY, userID);

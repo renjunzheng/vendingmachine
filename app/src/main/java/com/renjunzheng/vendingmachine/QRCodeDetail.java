@@ -44,7 +44,7 @@ public class QRCodeDetail extends AppCompatActivity {
     private static final HashMap<Character, String> myMap;
     static
     {
-        myMap = new HashMap<Character, String>();
+        myMap = new HashMap<>();
         myMap.put('0', "d");
         myMap.put('1', "g");
         myMap.put('2', "i");

@@ -57,12 +57,12 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             // In this case the id needs to be fully qualified with a table name, since
             // the content provider joins the user,item,purchased tables in the background
             // (both have an _id column)
-            /*
+
             DataContract.ItemEntry.TABLE_NAME + "." + DataContract.ItemEntry._ID,
             DataContract.ItemEntry.COLUMN_ITEM_NAME,
             DataContract.ItemEntry.COLUMN_REMAINING_NUM,
             DataContract.ItemEntry.COLUMN_SHORT_DESC,
-            DataContract.ItemEntry.COLUMN_PRICE*/
+            DataContract.ItemEntry.COLUMN_PRICE
     };
 
     static final int COL_ITEM_ID = 0;
