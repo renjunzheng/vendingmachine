@@ -72,7 +72,7 @@ public class QRCodeDetail extends AppCompatActivity {
         //mControlsView = findViewById(R.id.fullscreen_content_controls);
         mImageView = (ImageView)findViewById(R.id.qrcode_content_imageview);
 
-        Toast.makeText(this, "Tap on the QR code so QR scanner can have a better image.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Tap on the QR code so QR scanner can have a better image.", Toast.LENGTH_SHORT).show();
 
         try {
             Bitmap bitmap = encodeAsBitmap("uvm:"+myMap.get(code.charAt(0))+myMap.get(code.charAt(1))+myMap.get(code.charAt(2))+myMap.get(code.charAt(3)));

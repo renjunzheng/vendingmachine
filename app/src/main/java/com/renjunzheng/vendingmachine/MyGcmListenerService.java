@@ -30,6 +30,7 @@ import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -133,34 +134,53 @@ public class MyGcmListenerService extends GcmListenerService {
                 //query based on this item_name and get item id
                 //currently if queried has no such item in current database then don't insert to purchase table
                 //find user id using the stored email
-                String[] itemProj = new String[]{DataContract.ItemEntry._ID};
-                String[] itemSelArgs = new String[]{item_name};
-                Cursor itemIDCursor = database.query(DataContract.ItemEntry.TABLE_NAME,itemProj, DataContract.ItemEntry.COLUMN_ITEM_NAME + " = ?", itemSelArgs,
-                        null, null, null);
-                itemIDCursor.moveToNext();
-                int itemID = itemIDCursor.getInt(0);
-                itemIDCursor.close();
-                String[] userProj = new String[]{DataContract.UserEntry._ID};
-                String user_email = infoJson.getString("email");
-                String[] userSelArgs = new String[]{user_email};
-                Cursor userIDCursor = database.query(DataContract.UserEntry.TABLE_NAME,userProj, DataContract.UserEntry.COLUMN_EMAIL + " = ?", userSelArgs,
-                        null, null, null);
-                userIDCursor.moveToNext();
-                Log.i(TAG, "userID: "+user_email);
-                int userID = userIDCursor.getInt(0);
-                Log.i(TAG, "itemID: "+itemID);
-                Log.i(TAG, "userID: "+userID);
-                userIDCursor.close();
-                ContentValues newValues = new ContentValues();
-                newValues.put(DataContract.PurchasedEntry.COLUMN_ITEM_KEY, itemID);
-                newValues.put(DataContract.PurchasedEntry.COLUMN_USER_KEY, userID);
-                newValues.put(DataContract.PurchasedEntry.COLUMN_ORDER_TIME, infoJson.getString("order_time"));
-                newValues.put(DataContract.PurchasedEntry.COLUMN_PICK_UP_TIME, infoJson.getString("pickup_time"));
-                newValues.put(DataContract.PurchasedEntry.COLUMN_QUANTITY, infoJson.getString("quantity"));
-                newValues.put(DataContract.PurchasedEntry.COLUMN_RECEIPT_NUM, infoJson.getString("receipt"));
-                Uri returnedUri = getContentResolver().insert(DataContract.PurchasedEntry.CONTENT_URI,
-                        newValues);
-                Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
+                Cursor itemIDCursor;
+                int waitTime = 0;
+                boolean breaked = false;
+                do {
+                    String[] itemProj = new String[]{DataContract.ItemEntry._ID};
+                    String[] itemSelArgs = new String[]{item_name};
+                    itemIDCursor= database.query(DataContract.ItemEntry.TABLE_NAME,itemProj, DataContract.ItemEntry.COLUMN_ITEM_NAME + " = ?", itemSelArgs,
+                            null, null, null);
+                    if(waitTime != 0) {
+                        // if the item is not yet exists in the item table, probably means update purchase get called before update storage. So wait until find
+                        SystemClock.sleep(1000);
+                        if( ++waitTime > 30) {
+                            breaked = true;
+                            break;
+                        }
+                    }else if (waitTime == 0){
+                        waitTime = 1;
+                    }
+                } while(itemIDCursor != null && itemIDCursor.getCount() != 0);
+
+                if(!breaked) {
+                    itemIDCursor.moveToNext();
+                    int itemID = itemIDCursor.getInt(0);
+                    itemIDCursor.close();
+
+                    String[] userProj = new String[]{DataContract.UserEntry._ID};
+                    String user_email = infoJson.getString("email");
+                    String[] userSelArgs = new String[]{user_email};
+                    Cursor userIDCursor = database.query(DataContract.UserEntry.TABLE_NAME, userProj, DataContract.UserEntry.COLUMN_EMAIL + " = ?", userSelArgs,
+                            null, null, null);
+                    userIDCursor.moveToNext();
+                    Log.i(TAG, "userID: " + user_email);
+                    int userID = userIDCursor.getInt(0);
+                    Log.i(TAG, "itemID: " + itemID);
+                    Log.i(TAG, "userID: " + userID);
+                    userIDCursor.close();
+                    ContentValues newValues = new ContentValues();
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_ITEM_KEY, itemID);
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_USER_KEY, userID);
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_ORDER_TIME, infoJson.getString("order_time"));
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_PICK_UP_TIME, infoJson.getString("pickup_time"));
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_QUANTITY, infoJson.getString("quantity"));
+                    newValues.put(DataContract.PurchasedEntry.COLUMN_RECEIPT_NUM, infoJson.getString("receipt"));
+                    Uri returnedUri = getContentResolver().insert(DataContract.PurchasedEntry.CONTENT_URI,
+                            newValues);
+                    Log.i(TAG, "inserted row num " + ContentUris.parseId(returnedUri));
+                }
             }
 
             database.close();

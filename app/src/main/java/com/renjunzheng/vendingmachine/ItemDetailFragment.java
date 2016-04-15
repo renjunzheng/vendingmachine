@@ -157,7 +157,7 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             mQuantity.requestFocus();
             return;
         }
-        
+
         boolean enough = false;
 
 
@@ -229,7 +229,9 @@ public class ItemDetailFragment extends Fragment implements LoaderManager.Loader
             showProgress(false);
 
             if(returnCode > 0){
-                Toast.makeText(getActivity(), "Your purchase has been processed! Receipt Code is: " + Integer.toString(returnCode), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getActivity(), "Your purchase has been processed! Receipt Code is: " + Integer.toString(returnCode), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), QRCodeDetail.class).putExtra(Intent.EXTRA_TEXT, Integer.toString(returnCode));
+                startActivity(intent);
             }else if(returnCode == -1){
                 mQuantity.setError("Don't have enough money");
                 mQuantity.requestFocus();

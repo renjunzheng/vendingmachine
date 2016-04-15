@@ -6,24 +6,28 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:orientation="horizontal"
     android:padding="16dp" >
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:id="@+id/list_item_purchases_name"
-        android:gravity="center_vertical"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_weight="1">
-    </TextView>
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:id="@+id/list_item_purchases_receipt"
-        android:gravity="center_vertical"
-        android:layout_width="wrap_content"
-        android:layout_weight="1">
-    </TextView>
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="wrap_content"
+            android:id="@+id/list_item_purchases_name"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:layout_width="wrap_content" >
+        </TextView>
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_height="wrap_content"
+            android:id="@+id/list_item_purchases_receipt"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:layout_weight="1"
+            android:layout_width="wrap_content" >
+        </TextView>
+    </LinearLayout>
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_height="wrap_content"
@@ -31,7 +35,7 @@
         android:id="@+id/list_item_purchases_buy_time"
         android:gravity="center_vertical"
         android:layout_width="wrap_content"
-        android:layout_weight="1">
+        android:layout_weight="2">
     </TextView>
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
@@ -40,6 +44,6 @@
         android:id="@+id/list_item_purchases_pickup_time"
         android:gravity="center_vertical"
         android:layout_width="wrap_content"
-        android:layout_weight="1">
+        android:layout_weight="2">
     </TextView>
 </LinearLayout>
