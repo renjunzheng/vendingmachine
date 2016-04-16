@@ -67,7 +67,7 @@ public class QRCodeDetail extends AppCompatActivity {
         setContentView(R.layout.activity_qrcode_detail);
 
         mTextView = (TextView) findViewById(R.id.qrcode_content_textview);
-        mTextView.setText("Receipt code is: " + code);
+        mTextView.setText("Receipt code is:" + code);
         mVisible = true;
         //mControlsView = findViewById(R.id.fullscreen_content_controls);
         mImageView = (ImageView)findViewById(R.id.qrcode_content_imageview);

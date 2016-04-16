@@ -97,17 +97,44 @@ public class MyGcmListenerService extends GcmListenerService {
                     updateStorageInfo(updated_info1);
                     break;
                 case "UPDATE_PURCHASE_INFO":
+                    Log.i(TAG, "received an update");
                     String updated_info2 = data.getString("updated_info");
                     updatePurchaseInfo(updated_info2);
                     break;
                 case "CONFIRM_PURCHASE":
                     confirmPurchase(Integer.parseInt(data.getString("purchase_status")));
                     break;
+                case "UPDATE_USER_INFO":
+                    updateBalance(data);
+                    break;
             }
         }
         // [END_EXCLUDE]
     }
     // [END receive_message]
+
+    private void updateBalance(Bundle data){
+
+        ContentValues newValues = new ContentValues();
+        newValues.put(DataContract.UserEntry.COLUMN_DISPLAY_NAME, data.getString("real_name"));
+        newValues.put(DataContract.UserEntry.COLUMN_MONEY_LEFT, data.getString("balance"));
+
+        String selection = DataContract.UserEntry.COLUMN_EMAIL + " =?";
+        String[] selectionArgs = {data.getString("email")};
+        int rowUpdated = getContentResolver().update(DataContract.UserEntry.CONTENT_URI,
+                newValues,
+                selection,
+                selectionArgs);
+        if(rowUpdated == 0){
+            newValues.put(DataContract.UserEntry.COLUMN_EMAIL, data.getString("email"));
+            Uri returnedUri = getContentResolver().insert(DataContract.UserEntry.CONTENT_URI,
+                    newValues);
+            Log.i(TAG,"inserted row num " + ContentUris.parseId(returnedUri));
+        }else{
+            Log.i(TAG,"updated row num " + Integer.toString(rowUpdated));
+        }
+    }
+
 
     private void confirmPurchase(int purchase_status){
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
@@ -152,7 +179,7 @@ public class MyGcmListenerService extends GcmListenerService {
                     }else if (waitTime == 0){
                         waitTime = 1;
                     }
-                } while(itemIDCursor != null && itemIDCursor.getCount() != 0);
+                } while(itemIDCursor == null || itemIDCursor.getCount() == 0);
 
                 if(!breaked) {
                     itemIDCursor.moveToNext();
